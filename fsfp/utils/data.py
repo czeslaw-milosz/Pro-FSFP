@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import torch
+from tqdm import tqdm
 from collections import defaultdict
 from itertools import chain
 from sklearn.preprocessing import StandardScaler
@@ -101,7 +102,7 @@ def process_dms(file_path, shuffle=True, max_len=1022, wild_type=None):
 def merge_files(data_dir, shuffle=True, max_len=1022, save_path=None):
     file_names = os.listdir(data_dir)
     proteins = defaultdict(list)
-    for file_name in file_names:
+    for file_name in tqdm(file_names, desc="Merging files..."):
         if 'indels' in file_name:
             continue
         protein = process_dms(f'{data_dir}/{file_name}', shuffle, max_len)

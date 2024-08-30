@@ -27,6 +27,7 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     data_path = config.data_path.replace('.pkl', f'{args.save_postfix}.pkl')
+    print(f"Running in mode: {args.mode}")
     if args.mode == 'vectorize':
         proteins = torch.load(data_path)
         if args.model == 'saprot':

@@ -4,7 +4,7 @@ from torch.nn.functional import pairwise_distance
 from transformers import EsmTokenizer, EsmForMaskedLM
 from tqdm import tqdm
 from . import config
-from .pipeline import model_names
+# from .pipeline import model_names
 from .dataset.base import ProteinSequenceData
 from .utils.data import make_dir
 
@@ -39,11 +39,12 @@ class Retriever():
     def __init__(self, parsed_args, data_constructor=ProteinSequenceData, hidden_fn=None):
         self.args = parsed_args
         self.device = 'cpu' if parsed_args.force_cpu or not torch.cuda.is_available() else 'cuda'
+        print(f"Using device: {self.device}")
         self.data_constructor = data_constructor
         self.hidden_fn = hidden_fn
     
     def get_base_model(self):
-        model_name = model_names[self.args.model]
+        model_name = config.model_dir[self.args.model]
         model = EsmForMaskedLM.from_pretrained(model_name, output_hidden_states=True)
         tokenizer = EsmTokenizer.from_pretrained(model_name)
         return model, tokenizer
