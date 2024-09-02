@@ -1,3 +1,20 @@
+# How to run predictions on new data (RJ)
+
+0. You will need to setup an environment with Python 3.10. When inside the environment, execute the following steps:
+ - `git clone https://github.com/czeslaw-milosz/Pro-FSFP.git`
+ - `pip install -r requirements.txt`
+ - (optional) if you run into torch trouble when running predictions, `pip uninstall torch_xla` might help you.
+
+1. Download `checkpoints.zip` (130MB) from https://storage.cloud.google.com/deepflare-checkpoints/checkpoints.zip and extract it to `Pro-FSFP/checkpoints`.
+
+2. Prepare your mutants file in CSV; see `data/demo` for an example of the correct data format. Place your csv file under `Pro-FSFP/data/pred_data`.
+
+3. To run predictions on new data, cd to `Pro-FSFP` and run:
+```bash
+python main.py -ckpt checkpoints/meta/esm2/A0A140D2T1_ZIKV_Sourisseau_2019/r16_ts40_cv4_cosine_mt3_GEMME --model esm2 --protein A0A140D2T1_ZIKV --predict
+```
+You will find results in the `predictions/` directory.
+
 # Pro-FSFP: Few-Shot Protein Fitness Prediction
 Supported PLMs: **ESM-1b, ESM-1v, ESM-2, and SaProt**
 
