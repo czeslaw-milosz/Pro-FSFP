@@ -7,9 +7,11 @@
 
 1. Download `checkpoints.zip` (130MB) from https://storage.cloud.google.com/deepflare-checkpoints/checkpoints.zip and extract it to `Pro-FSFP/checkpoints`.
 
-2. Prepare your mutants file in CSV; see `data/demo` for an example of the correct data format. Place your csv file under `Pro-FSFP/data/pred_data`.
+2. Prepare your mutants file in CSV; see `data/demo` for an example of the correct data format. Place your csv file under `Pro-FSFP/data/pred_data`. **Please ensure** you filename starts with `A0A140D2T1_ZIKV` (a not-very-clever requirement of the original codebase).
 
-3. To run predictions on new data, cd to `Pro-FSFP` and run:
+3. Run `python preprocess.py`. Make sure a file called `merged.pkl` appeared in `data/`.
+
+4. To run predictions on new data, cd to `Pro-FSFP` and run:
 ```bash
 python main.py -ckpt checkpoints/meta/esm2/A0A140D2T1_ZIKV_Sourisseau_2019/r16_ts40_cv4_cosine_mt3_GEMME --model esm2 --protein A0A140D2T1_ZIKV --predict
 ```
