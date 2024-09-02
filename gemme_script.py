@@ -2,7 +2,9 @@
 
 `gemme_dir` should point to the directory containing GEMME scores for your dataset.
 `target_dir` should point to the directory where you want the final dataframe to be saved; it should contain raw ProteinGym data for the task.
-Generally, this is a duckt-tape solution necessary because ProteinGym's own df merging scripts currently don't work.
+Generally, this is a duct tape solution necessary because ProteinGym's own df merging scripts currently don't work.
+Note that is supports only GEMME scores right now -- other auxiliary scorers would sometimes need different processing because of reasons xd
+(FSFP suggests using GEMME anyway so no big issue here)
 """
 from pathlib import Path
 
