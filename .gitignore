@@ -1,2 +1,3 @@
 *.pyc
-data/substitutions/
+# data/substitutions/
+checkpoints/meta*
