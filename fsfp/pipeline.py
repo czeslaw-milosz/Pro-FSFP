@@ -278,6 +278,36 @@ class Pipeline():
         predicts.to_csv(save_path)
         return report
     
+    def predict_single(self, train, test, checkpoint_dir):
+        args = self.args
+        if args.epochs > 0:
+            if args.lora_r == 0:
+                model, tokenizer = self.get_base_model(checkpoint_dir)
+            else:
+                model, tokenizer = self.get_base_model()
+                model = PeftModel.from_pretrained(model, checkpoint_dir, is_trainable=True)
+        else:
+            model, tokenizer = self.get_base_model()
+        
+        test_data = self.data_constructor(test, tokenizer,
+                                          mask=args.mask in {'eval', 'all'},
+                                          device=self.device)
+        test_iter = DataLoader(test_data,
+                               batch_size=args.eval_batch,
+                               collate_fn=test_data.collate)
+        trainer = RankingTrainer(model.to(self.device), log_metrics=[], score_fn=self.score_fn)
+        predicts, _ = trainer.evaluate_epoch(test_iter)
+        predicts = predicts.tolist()
+        
+        predicts = pd.Series(predicts, index=test['df'].index, name='prediction')
+        
+        print('Saving model predictions...')
+        save_path = self.get_save_dir(args.mode, test['name'], prediction=True)
+        save_path += '_base.csv' if args.epochs == 0 else '.csv'
+        make_dir(save_path)
+        predicts.to_csv(save_path)
+        return predicts, save_path
+    
     def select_datasets(self, all_proteins):
         args = self.args
         if args.protein in all_proteins.keys():
@@ -339,10 +369,20 @@ class Pipeline():
                 eval_metric = args.eval_metric
                 args.eval_metric = 'ndcg' # in case of nan spearmanr
             
-            train, test = split_data(protein, args.train_size, n_sites=args.n_sites,
+            train_size = 0.0 if args.predict else args.train_size
+            train, test = split_data(protein, train_size, n_sites=args.n_sites,
                                      neg_train=args.negative_train, scale=args.list_size == 1)
             if args.test:
                 report = self.test_single(train, test)
+            elif args.predict:
+                predictions, save_path = self.predict_single(train, test, checkpoint_dir=args.checkpoint_dir)
+                predictions = pd.DataFrame(predictions)
+                sourisseau_df = pd.read_csv(config.auxiliary_df).drop(["GEMME", "mutated_sequence"], axis=1)
+                predictions = predictions.merge(sourisseau_df, on="mutant", how="left")
+                predictions["DMS_score"].fillna(-1, inplace=True)
+                predictions["DMS_score_bin"].fillna(-1, inplace=True)
+                predictions = predictions.sort_values("DMS_score", ascending=False)
+                predictions.to_csv(save_path, index=False)
             elif args.mode != 'meta':
                 if args.mode == 'finetune' and args.augment:
                     protein = self.augment_data(protein)[0]
@@ -356,7 +396,9 @@ class Pipeline():
                 if args.meta_tasks < 4:
                     meta_train *= 2
                 report = self.meta_single(meta_train, train, test)
-            reports[protein['name']] = report
+            
+            if not args.predict:
+                reports[protein['name']] = report
             torch.cuda.empty_cache()
             
             if protein['name'] == 'CCDB_ECOLI_Tripathi_2016':

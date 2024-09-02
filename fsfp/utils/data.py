@@ -87,7 +87,7 @@ def process_dms(file_path, shuffle=True, max_len=1022, wild_type=None):
         n_sites.add(len(positions))
     
     new_df = pd.concat([pd.DataFrame(new_df, index=df.index),
-                        df[['DMS_score', 'DMS_score_bin']]], axis=1)
+                        df[['DMS_score', 'DMS_score_bin', 'mutated_sequence']]], axis=1)
     if wild_type is None:
         wild_type = list(row['mutated_sequence'])
         for wt_aa, position in zip(wt_aas, positions): # recover wild type sequence
@@ -105,6 +105,14 @@ def merge_files(data_dir, shuffle=True, max_len=1022, save_path=None):
     for file_name in tqdm(file_names, desc="Merging files..."):
         if 'indels' in file_name:
             continue
+        df = pd.read_csv(f'{data_dir}/{file_name}')
+        # if "mutant" not in df.columns:
+        #     df["mutant"] = [f"{str(i)}_placeholder" for i in range(len(df))]
+        for colname in ["DMS_score", "DMS_score_bin"]:
+            print(f"Adding artificial DMS scores to file: {file_name}")
+            if colname not in df.columns:
+                df[colname] = -1.0
+                df.to_csv(f'{data_dir}/{file_name}', index=False)
         protein = process_dms(f'{data_dir}/{file_name}', shuffle, max_len)
         name = '_'.join(file_name.split('_')[:2])
         proteins[name].append(protein)
