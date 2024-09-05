@@ -9,9 +9,12 @@
 
 2. Prepare your mutants file in CSV; see `data/demo` for an example of the correct data format. Place your csv file under `Pro-FSFP/data/pred_data`. **Please ensure** you filename starts with `A0A140D2T1_ZIKV` (a not-very-clever requirement of the original codebase).
 
-3. Run `python preprocess.py`. Make sure a file called `merged.pkl` appeared in `data/`.
+3. **Switch from envelope to full protein format** by running
+```python envelope2protein --input_file {YOUR_INPUT_CSV}```
 
-4. To run predictions on new data, cd to `Pro-FSFP` and run:
+4. Run `python preprocess.py`. Make sure a file called `merged.pkl` appeared in `data/`.
+
+5. To run predictions on new data, cd to `Pro-FSFP` and run:
 ```bash
 python main.py -ckpt checkpoints/meta/esm2/A0A140D2T1_ZIKV_Sourisseau_2019/r16_ts40_cv4_cosine_mt3_GEMME --model esm2 --protein A0A140D2T1_ZIKV --predict
 ```
