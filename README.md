@@ -11,6 +11,7 @@
 
 3. **Switch from envelope to full protein format** by running
 ```python envelope2protein --input_file {YOUR_INPUT_CSV}```
+(this will convert your csv file in-place from envelope format to full protein format)
 
 4. Run `python preprocess.py`. Make sure a file called `merged.pkl` appeared in `data/`.
 

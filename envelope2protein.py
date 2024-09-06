@@ -22,9 +22,9 @@ def paste_envelope_into_zika_protein(envelope: str) -> str:
     return result
 
 
-def shift_mutant_code(mutant_code: str) -> str:
-    before, site, after = mutant_code[0], int(mutant_code[1:-1]), mutant_code[-1]
-    return before + str(site + ENVELOPE_INDEX_LEFT) + after
+# def shift_mutant_code(mutant_code: str) -> str:
+#     before, site, after = mutant_code[0], int(mutant_code[1:-1]), mutant_code[-1]
+#     return before + str(site + ENVELOPE_INDEX_LEFT) + after
 
 if __name__ == "__main__":
     args = parse_args()
