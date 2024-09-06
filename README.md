@@ -5,7 +5,7 @@
  - from `Pro-FSFP`, run `pip install -r requirements.txt`
  - (optional) if you run into torch trouble when running predictions, `pip uninstall torch_xla` might help you.
 
-1. Download `checkpoints.zip` (130MB) from https://storage.cloud.google.com/deepflare-checkpoints/checkpoints.zip and extract it to `Pro-FSFP/checkpoints`.
+1. Download `checkpoints.zip` (130MB) from S3 bucket `zika-tmp` and extract it to `Pro-FSFP/checkpoints`.
 
 2. Prepare your mutants file in CSV; see `data/demo` for an example of the correct data format. Place your csv file under `Pro-FSFP/data/pred_data`. **Please ensure** you filename starts with `A0A140D2T1_ZIKV` (a not-very-clever requirement of the original codebase).
 
@@ -16,11 +16,18 @@
 4. Run `python preprocess.py`. Make sure a file called `merged.pkl` appeared in `data/`.
 
 5. To run predictions on new data, cd to `Pro-FSFP` and run:
+
+**For the model trained on Sourisseau et al. 2019 data from ProteinGym (more reliable):**
 ```bash
 python main.py -ckpt checkpoints/meta/esm2/A0A140D2T1_ZIKV_Sourisseau_2019/r16_ts40_cv4_cosine_mt3_GEMME --model esm2 --protein A0A140D2T1_ZIKV --predict
 ```
 You will find results in the `predictions/` directory.
 
+**For the model trained on Kikawa et al. data (potentially not reliable at all, use with caution):**
+```bash
+python main.py -ckpt ccheckpoints/meta-transfer/esm2/A0A140D2T1_ZIKV_Kikawa/r16_ts40_cv4_cosine_mt3_kikawa --model esm2 --protein A0A140D2T1_ZIKV --save_prefix kikawa --predict
+```
+You will find results in the `predictions/` directory.
 
 ------------------------------------------
 ------------------------------------------
