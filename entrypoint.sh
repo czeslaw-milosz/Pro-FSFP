@@ -13,5 +13,5 @@ conda activate fsfp
 set -euo pipefail
 
 # exec the final command:
-exec fastapi run app/main.py --proxy-headers --port 80
+exec fastapi run ./app/main.py --proxy-headers --port 80
 # CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
