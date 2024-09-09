@@ -25,7 +25,7 @@ You will find results in the `predictions/` directory.
 
 **For the model trained on Kikawa et al. data (potentially not reliable at all, use with caution):**
 ```bash
-python main.py -ckpt ccheckpoints/meta-transfer/esm2/A0A140D2T1_ZIKV_Kikawa/r16_ts40_cv4_cosine_mt3_kikawa --model esm2 --protein A0A140D2T1_ZIKV --save_prefix kikawa --predict
+python main.py -ckpt checkpoints/meta-transfer/esm2/A0A140D2T1_ZIKV_Kikawa/r16_ts40_cv4_cosine_mt3_kikawa --model esm2 --protein A0A140D2T1_ZIKV --save_prefix kikawa --predict
 ```
 You will find results in the `predictions/` directory.
 
