@@ -1,3 +1,5 @@
+import os
+
 import torch
 import random
 import numpy as np
@@ -382,6 +384,7 @@ class Pipeline():
                 predictions["DMS_score"].fillna(-1, inplace=True)
                 predictions["DMS_score_bin"].fillna(-1, inplace=True)
                 predictions = predictions.sort_values("DMS_score", ascending=False)
+                os.makedirs("predictions", exist_ok=True)
                 save_path = "predictions/current_predictions.csv"
                 predictions.to_csv(save_path, index=False)
             elif args.mode != 'meta':
