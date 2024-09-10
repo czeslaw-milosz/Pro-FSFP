@@ -21,14 +21,8 @@ def paste_envelope_into_zika_protein(envelope: str) -> str:
     assert len(result) == len(ZIKA_PROTEIN)
     return result
 
-
-# def shift_mutant_code(mutant_code: str) -> str:
-#     before, site, after = mutant_code[0], int(mutant_code[1:-1]), mutant_code[-1]
-#     return before + str(site + ENVELOPE_INDEX_LEFT) + after
-
-if __name__ == "__main__":
-    args = parse_args()
-    df = pd.read_csv(args.input_file)
+def main(input_file: str) -> None:
+    df = pd.read_csv(input_file)
 
     assert df["mutated_sequence"].str.len().nunique() == 1, "Mutated sequences have varied length!"
     mutated_seq_len = df["mutated_sequence"].str.len().unique()[0]
@@ -36,3 +30,12 @@ if __name__ == "__main__":
 
     df["mutated_sequence"] = ZIKA_PROTEIN_LEFT + df["mutated_sequence"] + ZIKA_PROTEIN_RIGHT
     df.to_csv(args.input_file, index=False)
+
+
+# def shift_mutant_code(mutant_code: str) -> str:
+#     before, site, after = mutant_code[0], int(mutant_code[1:-1]), mutant_code[-1]
+#     return before + str(site + ENVELOPE_INDEX_LEFT) + after
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args.input_file)

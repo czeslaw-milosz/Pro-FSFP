@@ -22,6 +22,7 @@ async def predict(data: MutantRequestData):
     target_protein_id = data.target_protein_id
     checkpoint = app_constants.CHECKPOINT_MAPPING[data.checkpoint]
     task_name = data.task_name
+    logging.info(f"Current working dir: {os.getcwd()}")
 
     # Convert input data to DataFrame
     df = pd.DataFrame({
