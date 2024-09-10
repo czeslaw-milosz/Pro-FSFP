@@ -7,8 +7,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-import constants as app_constants
-from models import MutantRequestData
+import app.constants as app_constants
+from app.models import MutantRequestData
 
 
 app = FastAPI()
