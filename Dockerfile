@@ -41,7 +41,7 @@ ADD "https://api.github.com/repos/czeslaw-milosz/Pro-FSFP/commits?per_page=1" la
 RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git /Pro-FSFP
 # COPY . /Pro-FSFP
 WORKDIR /Pro-FSFP
-COPY app /Pro-FSFP/
+# COPY app /Pro-FSFP/
 
 # ENVIRONMENT
 RUN echo "conda activate fsfp" >> ~/.bashrc
