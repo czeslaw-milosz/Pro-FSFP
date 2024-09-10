@@ -5,7 +5,7 @@ from pydantic import field_validator
 from pydantic import model_validator
 from typing_extensions import Self
 
-import constants as app_constants
+import app.constants as app_constants
 
 
 class MutantRequestData(BaseModel):
