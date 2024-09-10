@@ -375,13 +375,14 @@ class Pipeline():
             if args.test:
                 report = self.test_single(train, test)
             elif args.predict:
-                predictions, save_path = self.predict_single(train, test, checkpoint_dir=args.checkpoint_dir)
+                predictions, _ = self.predict_single(train, test, checkpoint_dir=args.checkpoint_dir)
                 predictions = pd.DataFrame(predictions)
                 sourisseau_df = pd.read_csv(config.auxiliary_df).drop(["GEMME", "mutated_sequence"], axis=1)
                 predictions = predictions.merge(sourisseau_df, on="mutant", how="left")
                 predictions["DMS_score"].fillna(-1, inplace=True)
                 predictions["DMS_score_bin"].fillna(-1, inplace=True)
                 predictions = predictions.sort_values("DMS_score", ascending=False)
+                save_path = "predictions/current_predictions.csv"
                 predictions.to_csv(save_path, index=False)
             elif args.mode != 'meta':
                 if args.mode == 'finetune' and args.augment:

@@ -25,6 +25,7 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 9
 RUN pip install --upgrade pip
 
 # ANACONDA
+COPY requirements.txt /tmp/requirements.txt
 RUN wget -O /tmp/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Linux-x86_64.sh
 RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && eval "$(/anaconda/bin/conda shell.bash hook)" \
@@ -33,19 +34,24 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && conda create python=3.10 --name fsfp \
     && conda activate fsfp \
     && conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia \
-    && conda install fastapi
+    && conda install fastapi uvicorn python-multipart \
+    && pip install -r /tmp/requirements.txt
 # REPO
+ADD "https://api.github.com/repos/czeslaw-milosz/Pro-FSFP/commits?per_page=1" latest_commit
 RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git /Pro-FSFP
+# COPY . /Pro-FSFP
 WORKDIR /Pro-FSFP
+COPY app /Pro-FSFP/
 
 # ENVIRONMENT
 RUN echo "conda activate fsfp" >> ~/.bashrc
-SHELL ["/bin/bash", "--login", "-c"]
+# SHELL ["/bin/bash", "--login", "-c"]
 
 # PORTS
 EXPOSE 80
 
 # Set entrypoint
 COPY entrypoint.sh ./
+RUN chmod +x ./entrypoint.sh
 ENTRYPOINT [ "./entrypoint.sh" ]
 # ENTRYPOINT ["bash", "-l"]

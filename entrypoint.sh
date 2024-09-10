@@ -1,17 +1,9 @@
-#!/bin/bash --login
-# The --login ensures the bash configuration is loaded, enabling Conda.
+#!/bin/bash
+set -e
 
-# Enable strict mode.
-# set -euo pipefail
-# ... Run whatever commands ...
-
-# Temporarily disable strict mode and activate conda:
-set +euo pipefail
+# Activate conda environment
+source /anaconda/etc/profile.d/conda.sh
 conda activate fsfp
 
-# Re-enable strict mode:
-set -euo pipefail
-
-# exec the final command:
-exec fastapi run ./app/main.py --proxy-headers --port 80
-# CMD ["fastapi", "run", "app/main.py", "--proxy-headers", "--port", "80"]
+# Start the FastAPI app
+exec uvicorn app.main:app --host 0.0.0.0 --port 80 --log_config log_config.yaml
