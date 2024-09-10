@@ -37,7 +37,7 @@ async def predict(data: MutantRequestData):
     logging.info(f"Stored input data with {len(df)} rows at {file_path}")
 
     # Convert the input data to ProteinGym format
-    subprocess.run(["python", "envelope2protein.py", file_path])
+    subprocess.run(["python", "envelope2protein.py", "--innput_file", file_path])
     logging.info(f"Converted input data to ProteinGym format and saved at {file_path}")
 
     # Run FSFP's prerocessing routine
