@@ -48,7 +48,7 @@ class MutantRequestData(BaseModel):
     
     @field_validator("device", mode="before")
     @classmethod
-    def validate_checkpoint(cls, v) -> Any:
+    def validate_device(cls, v) -> Any:
         if not v in {"cuda", "cpu"}:
             raise ValueError(f"Device must be one of: cuda, cpu; got: {v}")
         if v == "cuda" and not torch.cuda.is_available():
