@@ -38,7 +38,7 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
 
 # MODEL CHECKPOINTS
 COPY checkpoints.zip /root/
-RUN unzip /root/checkpoints.zip -d /root/checkpoints
+RUN unzip /root/checkpoints.zip -d /root
 COPY huggingface_cache/huggingface /root/.cache
 
 # REPO
@@ -47,6 +47,7 @@ RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git 
     && rm -r /Pro-FSFP/checkpoints \
     && mv /root/checkpoints /Pro-FSFP
 WORKDIR /Pro-FSFP
+ENV HF_HOME=/root/.cache/huggingface
 
 # ENVIRONMENT
 RUN echo "conda activate fsfp" >> ~/.bashrc
