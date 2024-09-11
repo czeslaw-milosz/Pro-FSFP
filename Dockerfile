@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update --yes --quiet && DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
     software-properties-common \
     build-essential apt-utils \
-    wget curl vim git ca-certificates gpg-agent kmod unzip
+    wget curl git ca-certificates gpg-agent kmod unzip
 
 # PYTHON 3.10
 RUN add-apt-repository --yes ppa:deadsnakes/ppa && apt-get update --yes --quiet
@@ -34,17 +34,17 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && conda create python=3.10 --name fsfp \
     && conda activate fsfp \
     && conda install -y pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia \
-    # && conda install fastapi uvicorn python-multipart \
     && pip install -r /tmp/requirements.txt
 # REPO
 ADD "https://api.github.com/repos/czeslaw-milosz/Pro-FSFP/commits?per_page=1" latest_commit
 RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git /Pro-FSFP && rm -r /Pro-FSFP/checkpoints
-# COPY . /Pro-FSFP
 WORKDIR /Pro-FSFP
-# RUN rm -r checkpoints
+
+# MODEL CHECKPOINTS
 COPY checkpoints.zip .
 RUN unzip checkpoints.zip
-# COPY app /Pro-FSFP/
+COPY huggingface_cache/huggingface /root/.cache
+# RUN unzip /root/.cache/huggingface.zip
 
 # ENVIRONMENT
 RUN echo "conda activate fsfp" >> ~/.bashrc

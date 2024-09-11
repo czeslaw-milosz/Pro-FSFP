@@ -2,3 +2,4 @@
 data/merged.pkl
 # data/substitutions/
 checkpoints/meta*
+huggingface_cache/
