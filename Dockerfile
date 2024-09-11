@@ -15,7 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-re
     python3.10-dev \
     python3.10-distutils \
     python3.10-lib2to3 \
-    python3.10-gdbm \
+    # python3.10-gdbm \
     pip
 
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 999 \
@@ -23,7 +23,8 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 9
 
 # ANACONDA
 COPY requirements.txt /tmp/requirements.txt
-RUN wget -O /tmp/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Linux-x86_64.sh
+# RUN wget -O /tmp/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Linux-x86_64.sh
+RUN wget -O /tmp/anaconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && eval "$(/anaconda/bin/conda shell.bash hook)" \
     && conda init \
@@ -36,11 +37,11 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && rm /tmp/requirements.txt
 
 # MODEL CHECKPOINTS
-COPY assets /root/assets
-RUN unzip /root/assets/checkpoints.zip -d /root  \ 
-    && mv assets/huggingface /root/.cache/huggingface \ 
+ADD assets /root/assets
+RUN unzip /root/assets/checkpoints.zip -d /root \
+    && mv /root/assets/huggingface/ /root/.cache/huggingface/ \ 
     && rm -r /root/assets
-# COPY huggingface_cache/huggingface /root/.cache/huggingface
+ENV HF_HOME=/root/.cache/huggingface
 
 # REPO
 ADD "https://api.github.com/repos/czeslaw-milosz/Pro-FSFP/commits?per_page=1" latest_commit
@@ -48,7 +49,6 @@ RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git 
     && rm -r /Pro-FSFP/checkpoints \
     && mv /root/checkpoints /Pro-FSFP
 WORKDIR /Pro-FSFP
-ENV HF_HOME=/root/.cache/huggingface
 
 # ENVIRONMENT
 RUN echo "conda activate fsfp" >> ~/.bashrc

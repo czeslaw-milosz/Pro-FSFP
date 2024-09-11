@@ -11,7 +11,13 @@ import app.constants as app_constants
 from app.models import MutantRequestData
 
 
-app = FastAPI()
+with open("app/api_description.md", "r") as f:
+    description_md = "".join(line for line in f.readlines())
+app = FastAPI(
+    title="Zika B-cell score API",
+    description=description_md
+)
+
 
 @app.get("/")
 async def root():
