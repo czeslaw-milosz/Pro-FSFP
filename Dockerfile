@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:2.4.1-cuda11.8-cudnn9-runtime
+FROM pytorch/pytorch:2.4.1-cuda11.8-cudnn9-runtime AS build
 
 ENV PYTHONUNBUFFERED=1 
 
@@ -12,9 +12,9 @@ RUN apt-get update --yes --quiet && DEBIAN_FRONTEND=noninteractive apt-get insta
 RUN add-apt-repository --yes ppa:deadsnakes/ppa && apt-get update --yes --quiet
 RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
     python3.10 \
-    python3.10-dev \
-    python3.10-distutils \
-    python3.10-lib2to3 \
+    # python3.10-dev \
+    # python3.10-distutils \
+    # python3.10-lib2to3 \
     # python3.10-gdbm \
     pip
 
@@ -23,7 +23,6 @@ RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 9
 
 # ANACONDA
 COPY requirements.txt /tmp/requirements.txt
-# RUN wget -O /tmp/anaconda.sh https://repo.anaconda.com/archive/Anaconda3-2024.06-1-Linux-x86_64.sh
 RUN wget -O /tmp/anaconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && eval "$(/anaconda/bin/conda shell.bash hook)" \
@@ -34,7 +33,18 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && conda install -y pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia \
     && pip install --upgrade pip \
     && pip install -r /tmp/requirements.txt \
-    && rm /tmp/requirements.txt
+    && rm /tmp/requirements.txt \
+    && conda install -c conda-forge conda-pack
+
+# PACKAGE ENVIRONMENT WITH CONDA-PACK FOR MULTISTAGE BUILD
+RUN conda-pack -n example -o /tmp/env.tar && \
+    mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
+    rm /tmp/env.tar
+RUN /venv/bin/conda-unpack
+
+# RUNTIME STAGE
+FROM debian:stable-slim AS runtime
+COPY --from=build /venv /venv
 
 # MODEL CHECKPOINTS
 ADD assets /root/assets
@@ -51,7 +61,7 @@ RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git 
 WORKDIR /Pro-FSFP
 
 # ENVIRONMENT
-RUN echo "conda activate fsfp" >> ~/.bashrc
+# RUN echo "conda activate fsfp" >> ~/.bashrc
 
 # PORTS
 EXPOSE 8080
