@@ -38,10 +38,10 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && pip install -r /tmp/requirements.txt
 # REPO
 ADD "https://api.github.com/repos/czeslaw-milosz/Pro-FSFP/commits?per_page=1" latest_commit
-RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git /Pro-FSFP && rm -r Pro-FSFP/checkpoints
+RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git /Pro-FSFP && rm -r /Pro-FSFP/checkpoints
 # COPY . /Pro-FSFP
 WORKDIR /Pro-FSFP
-RUN rm -r checkpoints
+# RUN rm -r checkpoints
 COPY checkpoints.zip .
 RUN unzip checkpoints.zip
 # COPY app /Pro-FSFP/
