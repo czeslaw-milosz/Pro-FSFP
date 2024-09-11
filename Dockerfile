@@ -38,7 +38,7 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
 
 # MODEL CHECKPOINTS
 COPY checkpoints.zip /root/
-RUN unzip /root/checkpoints.zip 
+RUN unzip /root/checkpoints.zip -d /root/checkpoints
 COPY huggingface_cache/huggingface /root/.cache
 
 # REPO
