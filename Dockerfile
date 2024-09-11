@@ -5,46 +5,38 @@ ENV PYTHONUNBUFFERED=1
 # SYSTEM
 RUN apt-get update --yes --quiet && DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
     software-properties-common \
-    build-essential apt-utils \
-    wget curl git ca-certificates gpg-agent unzip
+    build-essential apt-utils wget
 
-# PYTHON 3.10
-RUN add-apt-repository --yes ppa:deadsnakes/ppa && apt-get update --yes --quiet
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
-    python3.10 \
-    # python3.10-dev \
-    # python3.10-distutils \
-    # python3.10-lib2to3 \
-    # python3.10-gdbm \
-    pip
-
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 999 \
-    && update-alternatives --config python3 && ln -s /usr/bin/python3 /usr/bin/python
-
-# ANACONDA
-COPY requirements.txt /tmp/requirements.txt
-RUN wget -O /tmp/anaconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-RUN bash /tmp/anaconda.sh -b -p /anaconda \
-    && eval "$(/anaconda/bin/conda shell.bash hook)" \
+# ANACONDA; PACKAGE ENVIRONMENT WITH CONDA-PACK FOR MULTISTAGE BUILD
+COPY environment.yml /tmp/environment.yml
+RUN wget -O /tmp/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+RUN bash /tmp/miniconda.sh -b -p /miniconda \
+    && eval "$(/miniconda/bin/conda shell.bash hook)" \
     && conda init \
     && conda update -n base -c defaults conda \
-    && conda create python=3.10 --name fsfp \
-    && conda activate fsfp \
-    && conda install -y pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia \
-    && pip install --upgrade pip \
-    && pip install -r /tmp/requirements.txt \
-    && rm /tmp/requirements.txt \
-    && conda install -c conda-forge conda-pack
-
-# PACKAGE ENVIRONMENT WITH CONDA-PACK FOR MULTISTAGE BUILD
-RUN conda-pack -n example -o /tmp/env.tar && \
+    && conda env create -f /tmp/environment.yml \
+    && conda install -c conda-forge conda-pack \
+    && conda clean --all \
+    && conda-pack -n fsfp -o /tmp/env.tar && \
     mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
     rm /tmp/env.tar
 RUN /venv/bin/conda-unpack
 
 # RUNTIME STAGE
-FROM debian:stable-slim AS runtime
+FROM nvidia/cuda:11.8.0-base-ubuntu22.04 AS runtime
+
+# SYSTEM
+RUN apt-get update --yes --quiet && DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-recommends \
+    gcc software-properties-common \
+    build-essential apt-utils \
+    wget curl git ca-certificates gpg-agent unzip
 COPY --from=build /venv /venv
+
+# ACTIVATE ENVIRONMENT + MANUALLY INSTALL LEARN2LEARN
+SHELL ["/bin/bash", "-c"] 
+RUN source /venv/bin/activate \
+    && pip install --upgrade pip \
+    && pip install learn2learn>=0.2.0
 
 # MODEL CHECKPOINTS
 ADD assets /root/assets
@@ -60,13 +52,10 @@ RUN mkdir /Pro-FSFP && git clone https://github.com/czeslaw-milosz/Pro-FSFP.git 
     && mv /root/checkpoints /Pro-FSFP
 WORKDIR /Pro-FSFP
 
-# ENVIRONMENT
-# RUN echo "conda activate fsfp" >> ~/.bashrc
-
 # PORTS
 EXPOSE 8080
 
-# Set entrypoint
+# SET ENTRYPOINT
 COPY entrypoint.sh ./
 RUN chmod +x ./entrypoint.sh
 ENTRYPOINT [ "./entrypoint.sh" ]
