@@ -1,5 +1,4 @@
 *.pyc
 data/merged.pkl
-# data/substitutions/
 checkpoints/meta*
 assets/
