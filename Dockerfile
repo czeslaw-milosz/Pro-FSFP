@@ -36,7 +36,7 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && rm /tmp/requirements.txt
 
 # MODEL CHECKPOINTS
-COPY assets /root
+COPY assets /root/assets
 RUN unzip /root/assets/checkpoints.zip -d /root  \ 
     && mv assets/huggingface /root/.cache/huggingface \ 
     && rm -r /root/assets
