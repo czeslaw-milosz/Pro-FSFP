@@ -16,13 +16,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes --quiet --no-install-re
     python3.10-distutils \
     python3.10-lib2to3 \
     python3.10-gdbm \
-    # python3.10-tk \
     pip
 
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 999 \
     && update-alternatives --config python3 && ln -s /usr/bin/python3 /usr/bin/python
-
-# RUN pip install --upgrade pip
 
 # ANACONDA
 COPY requirements.txt /tmp/requirements.txt
@@ -39,9 +36,11 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && rm /tmp/requirements.txt
 
 # MODEL CHECKPOINTS
-COPY checkpoints.zip /root/
-RUN unzip /root/checkpoints.zip -d /root && rm /root/checkpoints.zip
-COPY huggingface_cache/huggingface /root/.cache/huggingface
+COPY assets/ /root/
+RUN unzip /root/assets/checkpoints.zip -d /root  \ 
+    && mv assets/huggingface /root/.cache/huggingface \ 
+    && rm -r /root/assets
+# COPY huggingface_cache/huggingface /root/.cache/huggingface
 
 # REPO
 ADD "https://api.github.com/repos/czeslaw-milosz/Pro-FSFP/commits?per_page=1" latest_commit
