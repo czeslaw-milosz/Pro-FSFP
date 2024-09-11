@@ -38,8 +38,8 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
 
 # MODEL CHECKPOINTS
 COPY checkpoints.zip /root/
-RUN unzip /root/checkpoints.zip -d /root
-COPY huggingface_cache/huggingface /root/.cache
+RUN unzip /root/checkpoints.zip -d /root && rm /root/checkpoints.zip
+COPY huggingface_cache/huggingface /root/.cache/huggingface
 
 # REPO
 ADD "https://api.github.com/repos/czeslaw-milosz/Pro-FSFP/commits?per_page=1" latest_commit
