@@ -33,7 +33,7 @@ RUN bash /tmp/anaconda.sh -b -p /anaconda \
     && conda update -n base -c defaults conda \
     && conda create python=3.10 --name fsfp \
     && conda activate fsfp \
-    && conda install -y pytorch pytorch-cuda=11.8 -c pytorch -c nvidia \
+    && conda install -y pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia \
     && pip install --upgrade pip \
     && pip install -r /tmp/requirements.txt \
     && rm /tmp/requirements.txt
