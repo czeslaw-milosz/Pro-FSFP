@@ -1,5 +1,6 @@
 from typing import Any
 
+import torch
 from pydantic import BaseModel
 from pydantic import field_validator
 from pydantic import model_validator
@@ -14,6 +15,7 @@ class MutantRequestData(BaseModel):
     mutated_sequence: list[str]
     checkpoint: str = "zika_proteingym"
     task_name: str = "zika"
+    device: str = "cuda"
 
 
     @model_validator(mode="after")
@@ -42,4 +44,13 @@ class MutantRequestData(BaseModel):
     def validate_checkpoint(cls, v) -> Any:
         if not v in app_constants.CHECKPOINT_MAPPING.keys():
             raise ValueError(f"Got unsupported checkpoint: {v}")
+        return v
+    
+    @field_validator("device", mode="before")
+    @classmethod
+    def validate_checkpoint(cls, v) -> Any:
+        if not v in {"cuda", "cpu"}:
+            raise ValueError(f"Device must be one of: cuda, cpu; got: {v}")
+        if v == "cuda" and not torch.cuda.is_available():
+            raise ValueError("GPU requested but not available")
         return v

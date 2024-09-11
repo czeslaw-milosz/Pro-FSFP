@@ -22,6 +22,7 @@ async def predict(data: MutantRequestData):
     target_protein_id = data.target_protein_id
     checkpoint = app_constants.CHECKPOINT_MAPPING[data.checkpoint]
     task_name = data.task_name
+    device = data.device
     logging.info(f"Current working dir: {os.getcwd()}")
 
     # Convert input data to DataFrame
@@ -47,8 +48,11 @@ async def predict(data: MutantRequestData):
 
     # Predict
     logging.info("Starting prediction")
-    subprocess.run(["python", "main.py", "-ckpt", checkpoint, "--force_cpu",
-                    "--model", "esm2", "--protein", target_protein_id, "--predict"])
+    pred_command = ["python", "main.py", "-ckpt", checkpoint, 
+                    "--model", "esm2", "--protein", target_protein_id, "--predict"]
+    if device == "cpu":
+        pred_command.append("--force_cpu")
+    subprocess.run(pred_command)
     assert os.path.exists(app_constants.OUTPUT_FNAME), "Prediction file not found, something went wrong"
 
     # Return result
