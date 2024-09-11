@@ -52,6 +52,7 @@ async def predict(data: MutantRequestData):
                     "--model", "esm2", "--protein", target_protein_id, "--predict"]
     if device == "cpu":
         pred_command.append("--force_cpu")
+    logging.info(f"Using device: {device}")
     subprocess.run(pred_command)
     assert os.path.exists(app_constants.OUTPUT_FNAME), "Prediction file not found, something went wrong"
 
