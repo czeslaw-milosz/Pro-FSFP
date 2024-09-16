@@ -1,10 +1,7 @@
 #!/bin/bash
 set -e
 
-# Activate conda environment
-# source /anaconda/etc/profile.d/conda.sh
-# conda activate fsfp
-
+# Activate pre-built conda environment
 source /venv/bin/activate
 
 # Start the FastAPI app
